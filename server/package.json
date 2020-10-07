@@ -1,0 +1,22 @@
+{
+  "name": "council-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BYUCS452F2020/the-council.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BYUCS452F2020/the-council/issues"
+  },
+  "homepage": "https://github.com/BYUCS452F2020/the-council#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
