@@ -27,6 +27,10 @@ AuthToken (**Token**, UserId)
 * Foreign Key UserId references User  
 * Authentication tokens given to users upon login. Used to prevent unauthorized access.  
 
+ProspectiveCouncilmember (**ProspectiveUserId**, NominatedBy, CampaignText)  
+* Foreign Key ProspectiveUserId references User
+* Foreign Key NominatedBy references User
+
 CouncilmemberVote (**ProspectiveUserId, VoterUserId**)  
 * Foreign Key ProspectiveUserId references User  
 * Foreign Key VoterUserId references User  
