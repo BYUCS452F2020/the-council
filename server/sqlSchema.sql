@@ -1,15 +1,9 @@
-CREATE TABLE role (
-  roleId INT AUTO_INCREMENT PRIMARY KEY,
-  title VARCHAR(255) NOT NULL
-);
-
 CREATE TABLE user (
   userId INT AUTO_INCREMENT PRIMARY KEY,
   userName VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL,
   password VARCHAR(255) NOT NULL,
-  roleId INT NOT NULL,
-  FOREIGN KEY (roleId) REFERENCES role(roleId)
+  role ENUM('user', 'councilmember') NOT NULL
 );
     
 CREATE TABLE authToken (
