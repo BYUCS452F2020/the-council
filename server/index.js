@@ -1,6 +1,6 @@
 const express = require("express");
 const dotenv = require("dotenv");
-const dbConnection = require("./dbconnection");
+const dbConnection = require("./dbConnection");
 
 // Load .env config file. Variables accessible in process.env.VAR_NAME
 dotenv.config();
