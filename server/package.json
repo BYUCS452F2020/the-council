@@ -18,8 +18,10 @@
   },
   "homepage": "https://github.com/BYUCS452F2020/the-council#readme",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "helmet": "^4.1.1",
     "mysql": "^2.18.1"
   },
   "devDependencies": {
