@@ -1,3 +1,5 @@
+const userService = require("./userService");
+
 async function getByQuestion(userId, questionId) {
   console.log("Get all answers by question", userId, questionId);
   const answers = [
@@ -23,6 +25,8 @@ async function getByQuestion(userId, questionId) {
 }
 
 async function create(userId, questionId, header, body) {
+  await userService.councilMemberCheck(userId);
+
   console.log("Create answer", userId, questionId, header, body);
   const answer = {
     answerId: 1002,
@@ -36,6 +40,8 @@ async function create(userId, questionId, header, body) {
 }
 
 async function update(userId, answerId, header, body) {
+  await userService.councilMemberCheck(userId);
+
   console.log("Update answer", userId, answerId, header, body);
   const answer = {
     answerId,
@@ -49,6 +55,8 @@ async function update(userId, answerId, header, body) {
 }
 
 async function deleteAnswer(userId, answerId) {
+  await userService.councilMemberCheck(userId);
+
   console.log("Delete answer", userId, answerId);
 }
 

@@ -1,5 +1,7 @@
+const util = require("util");
 const mysql = require("mysql");
 let connection;
+let boundQuery;
 
 function getConnection() {
   if (!connection) {
@@ -12,7 +14,10 @@ function getConnection() {
     });
     console.log("Creating DB connection…");
   }
-  return connection;
+  if (!boundQuery) {
+    boundQuery = util.promisify(connection.query.bind(connection));
+  }
+  return { query: boundQuery };
 }
 
 module.exports = {

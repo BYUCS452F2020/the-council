@@ -38,14 +38,12 @@ app.get("/", (req, res) => {
   );
 });
 
-app.get("/test", (req, res) => {
-  const connection = dbConnection.getConnection();
-  connection.query("SELECT * FROM user", function (error, results, fields) {
-    if (error) throw error;
-    // connected!
-    console.log(results);
-    res.send("Connected");
-  });
+app.get("/test", async (req, res) => {
+  const results = await dbConnection
+    .getConnection()
+    .query("SELECT email FROM user");
+  console.log(results);
+  res.send("Connected");
 });
 
 // Fallback error handler
