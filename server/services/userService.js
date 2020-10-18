@@ -3,6 +3,7 @@ const {
   hashPassword,
   checkHashedPassword,
   generateAuthToken,
+  isEmailValid,
 } = require("../util");
 
 /**
@@ -80,16 +81,19 @@ async function login(email, password) {
 }
 
 async function register(email, password, name) {
-  console.log("Register", email, password, name);
+  console.log("Register", email, name);
 
+  if (!isEmailValid(email)) throw new Error("Invalid email address");
   if (password.length < 8) throw new Error("Password must be ≥ 8 characters");
+  if (!name || name.trim().length === 0) throw new Error("Missing name");
+
   const hashedPassword = await hashPassword(password);
 
-  const result = await getConnection().query(
+  const insertResult = await getConnection().query(
     "insert into user (name, email, password, role) values (?, ?, ?, 'user')",
-    [name, email, hashedPassword]
+    [name.trim(), email.trim(), hashedPassword]
   );
-  const newUserId = result.insertId;
+  const newUserId = insertResult.insertId;
 
   const [
     user,
