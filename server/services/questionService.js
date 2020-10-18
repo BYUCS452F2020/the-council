@@ -1,103 +1,67 @@
+const { getConnection } = require("../dbConnection");
+
 async function getAll(userId) {
   console.log("Get all questions", userId);
-  const questions = [
-    {
-      questionId: 123,
-      askerId: 123,
-      createdAt: new Date(),
-      header: "What is life?",
-      body: "I need to know",
-    },
-    {
-      questionId: 456,
-      askerId: 456,
-      createdAt: new Date(),
-      header: "What will Rick Astley never do?",
-      body: "I just can’t remember",
-    },
-  ];
-
+  const questions = await getConnection().query("select * from question");
   return questions;
 }
 
 async function getByUser(userId, askerId) {
   console.log("Get all questions by user", userId, askerId);
-  const questions = [
-    {
-      questionId: 123,
-      askerId,
-      createdAt: new Date(),
-      header: "What is life?",
-      body: "I need to know",
-    },
-    {
-      questionId: 456,
-      askerId,
-      createdAt: new Date(),
-      header: "What will Rick Astley never do?",
-      body: "I just can’t remember",
-    },
-  ];
-
+  const questions = await getConnection().query(
+    "select * from question where askerId = ?",
+    [askerId]
+  );
   return questions;
 }
 
 async function create(userId, header, body) {
   console.log("Create question", userId, header, body);
-  const question = {
-    questionId: 789,
-    askerId: userId,
-    createdAt: new Date(),
-    header,
-    body,
-  };
-  return question;
+  const insertResult = await getConnection().query(
+    "insert into question (askerId, header, body) values (?, ?, ?)",
+    [userId, header.trim(), body.trim()]
+  );
+  const newQuestionId = insertResult.insertId;
+  // Return full question
+  return getById(userId, newQuestionId);
 }
 
 async function update(userId, questionId, header, body) {
   console.log("Update question", userId, questionId, header, body);
-  const question = {
-    questionId,
-    askerId: userId,
-    createdAt: new Date(),
-    header,
-    body,
-  };
-  return question;
+  const updateResult = await getConnection().query(
+    "update question set header = ?, body = ? where questionId = ?",
+    [header.trim(), body.trim(), questionId]
+  );
+  if (updateResult.changedRows !== 1) {
+    throw new Error("Error updating question");
+  }
+  return getById(userId, questionId);
 }
 
 async function deleteQuestion(userId, questionId) {
   console.log("Delete question", userId, questionId);
+  await getConnection().query("delete from question where questionId = ?", [
+    questionId,
+  ]);
 }
 
 async function getById(userId, questionId, includeAnswers) {
   console.log("Get question by ID", userId, questionId, includeAnswers);
-  const answers = [
-    {
-      answerId: 1001,
-      questionId,
-      answererId: 12,
-      createdAt: new Date(),
-      header: "Never give you up",
-      body: "...",
-    },
-    {
-      answerId: 1002,
-      questionId,
-      answererId: 13,
-      createdAt: new Date(),
-      header: "Never desert you",
-      body: "...",
-    },
-  ];
-  const question = {
-    questionId,
-    askerId: 456,
-    createdAt: new Date(),
-    header: "What will Rick Astley never do?",
-    body: "I just can’t remember",
-    answers,
-  };
+  const result = await getConnection().query(
+    "select * from question where questionId = ?",
+    [questionId]
+  );
+
+  if (!result.length) throw new Error(`Question ${questionId} not found`);
+  const [question] = result;
+
+  if (includeAnswers) {
+    question.answers = await getConnection().query(
+      "select * from answer where questionId = ?",
+      [questionId]
+    );
+  }
+
   return question;
 }
 

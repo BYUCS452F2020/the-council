@@ -31,7 +31,7 @@ CREATE TABLE councilmemberVote (
 CREATE TABLE question (
   questionId INT AUTO_INCREMENT PRIMARY KEY,
   askerId INT NOT NULL,
-  createdAt DATETIME,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
   header VARCHAR(255),
   body VARCHAR(65535),
   FOREIGN KEY (askerId) REFERENCES user(userId) ON DELETE CASCADE
@@ -41,7 +41,7 @@ CREATE TABLE answer (
   answerId INT AUTO_INCREMENT PRIMARY KEY,
   questionId INT NOT NULL,
   councilmemberId INT NOT NULL,
-  createdAt DATETIME,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
   header VARCHAR(255),
   body VARCHAR(65535),
   FOREIGN KEY (questionId) REFERENCES question(questionId) ON DELETE CASCADE,
