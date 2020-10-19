@@ -5,9 +5,9 @@ async function nominate(userId, prospectiveUserEmail, campaignText) {
   await userService.councilMemberCheck(userId);
   console.log("Nominate", userId, prospectiveUserEmail, campaignText);
 
-  // Create campaign
+  // Create campaign, and ensure prospective user isn’t already a councilmember
   const nominateResult = await getConnection().query(
-    "insert into prospectiveCouncilmember (prospectiveUserId, nominatedBy, campaignText) values ((select userId from user where email = ?), ?, ?)",
+    "insert into prospectiveCouncilmember (prospectiveUserId, nominatedBy, campaignText) values ((select userId from user where email = ? and role = 'user'), ?, ?)",
     [prospectiveUserEmail, userId, campaignText]
   );
   if (!nominateResult.affectedRows) throw new Error("Error nominating user");
@@ -25,6 +25,9 @@ async function nominate(userId, prospectiveUserEmail, campaignText) {
 async function vote(userId, prospectiveUserId) {
   await userService.councilMemberCheck(userId);
   console.log("Vote", userId, prospectiveUserId);
+  // Make sure user has been nominated
+  await getProspective(userId, prospectiveUserId);
+
   // Create vote
   const insertResult = await getConnection().query(
     "insert into councilmemberVote (prospectiveUserId, voterUserId) values (?, ?)",
@@ -57,19 +60,35 @@ async function vote(userId, prospectiveUserId) {
     if (updateResult.changedRows !== 1) {
       throw new Error("Error making user to councilmember");
     }
+    // Clear out votes and campaign
+    await getConnection().query(
+      "delete from councilmemberVote where prospectiveUserId = ?",
+      [prospectiveUserId]
+    );
+    await getConnection().query(
+      "delete from prospectiveCouncilmember where prospectiveUserId = ?",
+      [prospectiveUserId]
+    );
+
+    return "Thanks for voting! This user has received enough votes and is now a councilmember.";
+  } else {
+    return `Thanks for voting! This user now has ${voteCount} (majority of ${councilmemberCount} councilmember votes needed).`;
   }
 }
 
 async function updateProspective(userId, campaignText) {
-  await userService.councilMemberCheck(userId);
+  // This updates only the current user’s campaign text
   console.log("Update current prospective", userId, campaignText);
-  const prospectiveCouncilMember = {
-    userId: 12,
-    name: "john",
-    email: "john@example.com",
-    campaignText,
-  };
-  return prospectiveCouncilMember;
+  const updateResult = await getConnection().query(
+    "update prospectiveCouncilmember set campaignText = ? where prospectiveUserId = ?",
+    [campaignText.trim(), userId]
+  );
+  console.log(updateResult);
+  if (updateResult.affectedRows !== 1) {
+    throw new Error("Error updating your campaign text");
+  }
+  // Return details for current user
+  return getProspective(userId, userId);
 }
 
 async function getProspectives(userId) {
@@ -77,7 +96,7 @@ async function getProspectives(userId) {
   console.log("Get prospectives");
 
   const prospectives = await getConnection().query(
-    "select * from prospectiveCouncilmember PCM join user U on PCM.userId = U.userId"
+    "select userId, name, email, role, campaignText from prospectiveCouncilmember PCM join user U on PCM.prospectiveUserId = U.userId"
   );
   return prospectives;
 }
@@ -86,10 +105,12 @@ async function getProspective(userId, prospectiveUserId) {
   await userService.councilMemberCheck(userId);
   console.log("Get prospective", prospectiveUserId);
 
-  const prospectives = await getConnection().query(
-    "select * from prospectiveCouncilmember PCM join user U on PCM.userId = U.userId"
+  const result = await getConnection().query(
+    "select userId, name, email, role, campaignText from prospectiveCouncilmember PCM join user U on PCM.prospectiveUserId = U.userId where userId = ?",
+    [prospectiveUserId]
   );
-  return prospectives;
+  if (!result.length) throw new Error("Prospective councilmember not found");
+  return result[0];
 }
 
 module.exports = {

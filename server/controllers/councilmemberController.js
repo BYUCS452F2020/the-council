@@ -12,7 +12,7 @@ function vote(req, res, next) {
   const { params, query, body, userId } = req;
   service
     .vote(userId, body.prospectiveUserId)
-    .then(() => res.json({ success: true }))
+    .then((message) => res.json({ success: true, message }))
     .catch(next);
 }
 
