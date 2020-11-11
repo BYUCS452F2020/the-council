@@ -2,8 +2,8 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:the_council/models/auth.dart';
-import 'package:the_council/models/user.dart';
+import 'package:the_council/models/database.dart';
+import 'package:the_council/models/usermodel.dart';
 import 'package:the_council/root.dart';
 
 void main() {

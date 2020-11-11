@@ -2,7 +2,7 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:the_council/models/auth.dart';
+import 'package:the_council/models/database.dart';
 import 'package:the_council/main.dart';
 
 class EditQuestion extends StatelessWidget {

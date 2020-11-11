@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:the_council/models/user.dart';
+import 'package:the_council/models/usermodel.dart';
 
 class LoginResponse {
   bool success;

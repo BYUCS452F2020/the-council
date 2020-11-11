@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:the_council/models/auth.dart';
+import 'package:the_council/models/database.dart';
 
 class Login extends StatefulWidget {
   @override

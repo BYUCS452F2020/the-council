@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:the_council/screens/login.dart';
 import 'package:the_council/screens/tabs_screen.dart';
 
-import 'models/auth.dart';
-import 'models/user.dart';
+import 'models/database.dart';
+import 'models/usermodel.dart';
 
 class Root extends StatefulWidget {
   @override
@@ -29,7 +29,7 @@ class _RootState extends State<Root> {
             break;
           default: {
             return FutureBuilder<UserModel>(
-              future: auth.login(),
+              future: auth.login(), // returns user object from the get-go. they aren't logged in if you've gotten this far.
               builder: (context, snapshot) {
                 if(snapshot.hasData) {
                   // Provider.of<UserModel>(context, listen:false).name = snapshot.data.name;
