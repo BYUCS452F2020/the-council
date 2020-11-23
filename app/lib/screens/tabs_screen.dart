@@ -15,13 +15,17 @@ class Tabs extends StatefulWidget {
 class _TabsState extends State<Tabs> {
 
   Future<List<Question>> questions;
+  Future<List<Question>> allQuestions;
   bool isCouncilmember;
 
   @override
   void initState() {
     super.initState();
-    questions = Provider.of<Database>(context, listen: false).getQuestions();
-    isCouncilmember = Provider.of<UserModel>(context, listen: false).role == 'councilmember';
+    questions = Provider.of<Database>(context, listen: false).getQuestionsByUserID();
+    isCouncilmember = Provider
+        .of<UserModel>(context, listen: false)
+        .role == 'councilmember';
+    if (isCouncilmember) allQuestions = Provider.of<Database>(context, listen: false).getQuestions();
   }
 
   @override
@@ -40,52 +44,85 @@ class _TabsState extends State<Tabs> {
         //   ),
         // ),
         appBar: AppBar(
-          title: Text('the council'),
-          bottom: TabBar(
-            tabs: isCouncilmember ? [
-              Tab(text: 'ask'),
-              Tab(text: 'answer'),
-              Tab(text: 'vote')
-            ] :
+            title: Text('the council' + (isCouncilmember ? ' - councilmember' : ' - user')),
+            bottom: TabBar(
+                tabs: isCouncilmember ? [
+                  Tab(text: 'ask'),
+                  Tab(text: 'answer'),
+                  Tab(text: 'vote')
+                ] :
                 [Tab(text: 'ask')]
-          )
+            )
         ),
         body: TabBarView(
-            children: isCouncilmember ? [
-              getQuestionsPage(context),
-              Icon(Icons.edit),
-              Icon(Icons.how_to_vote)
-            ] : [
-                  getQuestionsPage(context),
-                ],
+          children: isCouncilmember ? [
+            getOwnQuestionsPage(context),
+            getQuestionsPage(context),
+            Icon(Icons.how_to_vote)
+          ] : [
+            getOwnQuestionsPage(context),
+          ],
         ),
       ),
     );
   }
 
-  Widget getQuestionsPage(BuildContext context){
+  Widget getOwnQuestionsPage(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<List<Question>>(
-          future: questions,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return ListView(
-                children: snapshot.data.map((e) => Text(e.header)).toList(),
-              );
+        body: FutureBuilder<List<Question>>(
+            future: questions,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ListView(
+                  children: snapshot.data.map<Widget>((e) =>
+                      QuestionListItem(e)).toList(),
+                );
+              }
+              else {
+                return Center(child: CircularProgressIndicator());
+              }
             }
-            else {
-              return Center(child: CircularProgressIndicator());
-            }
-          }
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => EditQuestion())
         ),
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      )
+        floatingActionButton: FloatingActionButton(
+          onPressed: () =>
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => EditQuestion())
+              ),
+          tooltip: 'Increment',
+          child: Icon(Icons.add),
+        )
+    );
+  }
+
+  Widget getQuestionsPage(BuildContext context) {
+    return Scaffold(
+        body: FutureBuilder<List<Question>>(
+            future: allQuestions,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ListView(
+                  children: snapshot.data.map<Widget>((e) =>
+                      QuestionListItem(e)).toList(),
+                );
+              }
+              else {
+                return Center(child: CircularProgressIndicator());
+              }
+            }
+        ),
+    );
+  }
+
+  Widget QuestionListItem(Question e) {
+    return ListTile(
+      title: Text(e.header),
+      subtitle: Text(e.body),
+      onTap: () =>
+          Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => EditQuestion())
+          ),
     );
   }
 }

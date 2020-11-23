@@ -7,13 +7,14 @@ import 'package:the_council/request_response/ask_response.dart';
 import 'package:the_council/request_response/login_response.dart';
 import 'package:the_council/models/usermodel.dart';
 import 'package:the_council/request_response/questions_response.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Database extends ChangeNotifier {
   String authToken;
   AuthStatus authstatus = AuthStatus.notSignedIn;
   String email;
   String password;
+  int userId;
 
   Future<bool> edit_question(String questionId, String header, String body) async {
     if (questionId == null) { // if we're adding a new question.
@@ -57,6 +58,24 @@ class Database extends ChangeNotifier {
 
   }
 
+  Future<List<Question>> getQuestionsByUserID() async {
+    final http.Response questionsResponse = await http.get(
+      Uri.https('thecouncil.tk', '/question/user/${userId}', {'authToken': this.authToken}),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+
+    if (questionsResponse.statusCode == 200) {
+      var response = QuestionsResponse.fromJson(jsonDecode(questionsResponse.body));
+      return (response.success) ? response.questions : Exception('\'not success\' response from server');
+    }
+    else {
+      throw Exception('Failed to ask');
+    }
+
+  }
+
   Future<UserModel> login() async {
     // loading();
 
@@ -81,6 +100,7 @@ class Database extends ChangeNotifier {
     // notifyListeners();
     var response = LoginResponse.fromJson(jsonDecode(loginResponse.body));
     authToken = response.authToken;
+    userId = response.user.userId;
     return response.user;
   }
 

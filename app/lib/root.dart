@@ -39,6 +39,7 @@ class _RootState extends State<Root> {
                   );
                 }
                 return Scaffold(
+
                     body: Container(
                       alignment: Alignment.center,
                       child: CircularProgressIndicator(),

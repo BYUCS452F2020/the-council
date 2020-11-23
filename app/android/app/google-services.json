@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "970335815788",
+    "firebase_url": "https://the-council-1e032.firebaseio.com",
+    "project_id": "the-council-1e032",
+    "storage_bucket": "the-council-1e032.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:970335815788:android:59fbb4bb9f1831f1073049",
+        "android_client_info": {
+          "package_name": "tk.thecouncil"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "970335815788-r5m6vatkjq1ofrhc0u5kif347oj841u1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZZ9f5l19r586n5htmqPIO-P1RVkDmbhQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "970335815788-r5m6vatkjq1ofrhc0u5kif347oj841u1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "970335815788-h4ptmvs4ntj37dc4rj5ccgroro1q4394.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "tk.thecouncil"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
