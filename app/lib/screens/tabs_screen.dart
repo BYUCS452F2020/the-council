@@ -28,11 +28,10 @@ class _TabsState extends State<Tabs> {
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    questions = Provider.of<Database>(context, listen: false).getQuestionsByUserID();
-    isCouncilmember = Provider
-        .of<UserModel>(context)
-        .role == 'councilmember';
-    if (isCouncilmember) allQuestions = Provider.of<Database>(context, listen: false).getAllQuestions();
+    Database database = Provider.of<Database>(context, listen: false);
+    questions = database.getQuestionsByUserID();
+    isCouncilmember = database.currentUser.role == 'councilmember';
+    if (isCouncilmember) allQuestions = database.getAllQuestions();
   }
 
   @override
