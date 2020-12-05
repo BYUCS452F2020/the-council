@@ -8,6 +8,7 @@ import 'package:the_council/request_response/login_response.dart';
 import 'package:the_council/models/usermodel.dart';
 import 'package:the_council/request_response/questions_response.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Database extends ChangeNotifier {
   String authToken;
@@ -77,31 +78,53 @@ class Database extends ChangeNotifier {
   }
 
   Future<UserModel> login() async {
-    // loading();
-
-    final http.Response loginResponse = await http.post(
-        'https://thecouncil.tk/user/login',
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, String> {
-          "email": this.email,
-          "password": this.password
-        })
-    );
-
-    if (loginResponse.statusCode == 200) {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: this.email,
+          password: this.password,
+      );
       authstatus = AuthStatus.signedIn;
-    }
-    else {
+      UserModel user = UserModel();
+
+      return UserModel(userId: userCredential.user.uid, email: userCredential.user.email);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that user.');
+      }
       authstatus = AuthStatus.notSignedIn;
       throw Exception('Failed to login');
     }
+    // loading();
+
+    // final http.Response loginResponse = await http.post(
+    //     'https://thecouncil.tk/user/login',
+    //     headers: <String, String>{
+    //       'Content-Type': 'application/json; charset=UTF-8',
+    //     },
+    //     body: jsonEncode(<String, String> {
+    //       "email": this.email,
+    //       "password": this.password
+    //     })
+    // );
+
+    // if (loginResponse.statusCode == 200) {
+    //   authstatus = AuthStatus.signedIn;
+    // }
+    // else {
+    //   authstatus = AuthStatus.notSignedIn;
+    //   throw Exception('Failed to login');
+    // }
     // notifyListeners();
-    var response = LoginResponse.fromJson(jsonDecode(loginResponse.body));
-    authToken = response.authToken;
-    userId = response.user.userId;
-    return response.user;
+    // var response = LoginResponse();
+    // authToken = response.authToken;
+    // userId = response.user.userId;
+
+    // return users.doc(); //response.user;
   }
 
   void setEmailAndPassword(email, password) {

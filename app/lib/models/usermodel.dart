@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 class UserModel extends ChangeNotifier{
-  int userId;
+  String userId;
   String role;
   String name;
   String email;

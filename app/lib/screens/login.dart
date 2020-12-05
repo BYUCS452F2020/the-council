@@ -35,7 +35,7 @@ class LoginFormState extends State<LoginForm> {
   // not a GlobalKey<MyCustomFormState>.
   final _formKey = GlobalKey<FormState>();
 
-  var emailController = TextEditingController(text: '1@test.com');
+  var emailController = TextEditingController(text: '1test@email.com');
   var passwordController = TextEditingController(text: 'password');
 
   @override
