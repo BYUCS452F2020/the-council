@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 
 class Question {
-  final int questionId;
-  final int askerId;
+  final String questionId;
+  final String askerId;
   final String createdAt;
   final String header;
   final String body;

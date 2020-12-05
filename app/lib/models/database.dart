@@ -15,81 +15,82 @@ class Database extends ChangeNotifier {
   AuthStatus authstatus = AuthStatus.notSignedIn;
   String email;
   String password;
-  int userId;
+  
+  UserModel currentUser;
 
-  Future<bool> edit_question(String questionId, String header, String body) async {
-    if (questionId == null) { // if we're adding a new question.
-      final http.Response ask_response = await http.post(
-          'https://thecouncil.tk/question',
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: jsonEncode(<String, String> {
-            "authToken": this.authToken,
-            "header": header,
-            "body": body,
-          })
-      );
-
-      if (ask_response.statusCode == 200) {
-        var response = AskResponse.fromJson(jsonDecode(ask_response.body));
-        return response.success;
+  Future<bool> editQuestion(String questionId, String header, String body) async {
+    CollectionReference collection = FirebaseFirestore.instance.collection('questions');
+    try {
+      if (questionId == null) { // if we're adding a new question.
+        await collection.add({
+          'askerId': currentUser.userId,
+          'askerName': currentUser.name,
+          'body': body,
+          'createdAt': Timestamp.now(),
+          'header': header
+        });
+        return true;
+      } else {
+        await collection.doc(questionId).update({
+          'body': body,
+          'header': header
+        });
       }
-      else {
-        throw Exception('Failed to ask');
-      }
+    } catch (e) {
+      print('Error creating/editing question: $e');
     }
   }
 
-  Future<List<Question>> getQuestions() async {
-    final http.Response questionsResponse = await http.get(
-        Uri.https('thecouncil.tk', '/question', {'authToken': this.authToken}),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-    );
-
-    if (questionsResponse.statusCode == 200) {
-      var response = QuestionsResponse.fromJson(jsonDecode(questionsResponse.body));
-      return (response.success) ? response.questions : Exception('\'not success\' response from server');
+  Future<List<Question>> getAllQuestions() async {
+    try {
+      CollectionReference collection = FirebaseFirestore.instance.collection('questions');
+      QuerySnapshot querySnapshot = await collection.get();
+      List<Question> questions = [];
+      querySnapshot.docs.forEach((doc) {
+        questions.add(Question(askerId: doc['askerId'],body: doc['body'], createdAt: doc['createdAt'].toString(), header: doc['header'], questionId: doc.id));
+      });
+      return questions;
+    } on Exception {
+      throw Exception('Failed to get all questions');
     }
-    else {
-      throw Exception('Failed to ask');
-    }
-
   }
 
   Future<List<Question>> getQuestionsByUserID() async {
-    final http.Response questionsResponse = await http.get(
-      Uri.https('thecouncil.tk', '/question/user/${userId}', {'authToken': this.authToken}),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    );
-
-    if (questionsResponse.statusCode == 200) {
-      var response = QuestionsResponse.fromJson(jsonDecode(questionsResponse.body));
-      return (response.success) ? response.questions : Exception('\'not success\' response from server');
+    try {
+      CollectionReference collection = FirebaseFirestore.instance.collection('questions');
+      QuerySnapshot querySnapshot = await collection.where('askerId', isEqualTo: currentUser.userId).get();
+      List<Question> questions = [];
+      querySnapshot.docs.forEach((doc) {
+        questions.add(Question(askerId: doc['askerId'],body: doc['body'], createdAt: doc['createdAt'].toString(), header: doc['header'], questionId: doc.id));
+      });
+      return questions;
+    } on Exception {
+      throw Exception('Failed to get all questions');
     }
-    else {
-      throw Exception('Failed to ask');
-    }
-
   }
 
   Future<UserModel> login() async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
     CollectionReference users = FirebaseFirestore.instance.collection('users');
     try {
       UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: this.email,
           password: this.password,
       );
-      authstatus = AuthStatus.signedIn;
-      UserModel user = UserModel();
 
-      return UserModel(userId: userCredential.user.uid, email: userCredential.user.email);
+      // Fetch user name and role from Firestore
+      String role = 'user';
+      String name = 'New User';
+      DocumentSnapshot userDocument = await users.doc(userCredential.user.uid).get();
+      if (userDocument.exists) {
+        role = userDocument.data()['role'];
+        name = userDocument.data()['name'];
+      }
+
+      currentUser = UserModel(userId: userCredential.user.uid, email: userCredential.user.email, role: role, name: name);
+      authstatus = AuthStatus.signedIn;
+
+      return currentUser;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         print('No user found for that email.');

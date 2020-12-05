@@ -31,7 +31,7 @@ class EditAnswer extends StatelessWidget {
             TextButton(
               child: Text('submit'),
               onPressed: () {
-                Provider.of<Database>(context, listen:false).edit_question(null, header.text, body.text);
+                Provider.of<Database>(context, listen:false).editQuestion(null, header.text, body.text);
                 Navigator.pop(context);
               },
             )

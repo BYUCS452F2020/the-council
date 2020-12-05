@@ -25,7 +25,7 @@ class _TabsState extends State<Tabs> {
     isCouncilmember = Provider
         .of<UserModel>(context, listen: false)
         .role == 'councilmember';
-    if (isCouncilmember) allQuestions = Provider.of<Database>(context, listen: false).getQuestions();
+    if (isCouncilmember) allQuestions = Provider.of<Database>(context, listen: false).getAllQuestions();
   }
 
   @override
