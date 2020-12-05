@@ -29,6 +29,7 @@ class Database extends ChangeNotifier {
           'createdAt': Timestamp.now(),
           'header': header
         });
+        notifyListeners();
         return true;
       } else {
         await collection.doc(questionId).update({

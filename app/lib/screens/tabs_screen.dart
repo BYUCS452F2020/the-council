@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:the_council/models/Question.dart';
 import 'package:the_council/models/database.dart';
 import 'package:the_council/models/usermodel.dart';
+import 'package:the_council/root.dart';
 
 import 'edit_question.dart';
 
@@ -21,9 +22,15 @@ class _TabsState extends State<Tabs> {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
     questions = Provider.of<Database>(context, listen: false).getQuestionsByUserID();
     isCouncilmember = Provider
-        .of<UserModel>(context, listen: false)
+        .of<UserModel>(context)
         .role == 'councilmember';
     if (isCouncilmember) allQuestions = Provider.of<Database>(context, listen: false).getAllQuestions();
   }
