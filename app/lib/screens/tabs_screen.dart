@@ -94,7 +94,7 @@ class _TabsState extends State<Tabs> {
           onPressed: () =>
               Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => EditQuestion())
+                  MaterialPageRoute(builder: (context) => EditQuestion.newQuestion())
               ),
           tooltip: 'Increment',
           child: Icon(Icons.add),
@@ -121,14 +121,14 @@ class _TabsState extends State<Tabs> {
     );
   }
 
-  Widget QuestionListItem(Question e) {
+  Widget QuestionListItem(Question question) {
     return ListTile(
-      title: Text(e.header),
-      subtitle: Text(e.body),
+      title: Text(question.header),
+      subtitle: Text(question.body),
       onTap: () =>
           Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => EditQuestion())
+              MaterialPageRoute(builder: (context) => EditQuestion.existingQuestion(question))
           ),
     );
   }

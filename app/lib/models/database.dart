@@ -36,6 +36,7 @@ class Database extends ChangeNotifier {
           'body': body,
           'header': header
         });
+        notifyListeners();
       }
     } catch (e) {
       print('Error creating/editing question: $e');
