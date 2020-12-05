@@ -15,7 +15,7 @@ class Database extends ChangeNotifier {
   AuthStatus authstatus = AuthStatus.notSignedIn;
   String email;
   String password;
-  
+
   UserModel currentUser;
 
   Future<bool> editQuestion(String questionId, String header, String body) async {
@@ -46,7 +46,7 @@ class Database extends ChangeNotifier {
   Future<List<Question>> getAllQuestions() async {
     try {
       CollectionReference collection = FirebaseFirestore.instance.collection('questions');
-      QuerySnapshot querySnapshot = await collection.get();
+      QuerySnapshot querySnapshot = await collection.orderBy('createdAt', descending: true).get();
       List<Question> questions = [];
       querySnapshot.docs.forEach((doc) {
         questions.add(Question(askerId: doc['askerId'],body: doc['body'], createdAt: doc['createdAt'].toString(), header: doc['header'], questionId: doc.id));
@@ -60,14 +60,14 @@ class Database extends ChangeNotifier {
   Future<List<Question>> getQuestionsByUserID() async {
     try {
       CollectionReference collection = FirebaseFirestore.instance.collection('questions');
-      QuerySnapshot querySnapshot = await collection.where('askerId', isEqualTo: currentUser.userId).get();
+      QuerySnapshot querySnapshot = await collection.where('askerId', isEqualTo: currentUser.userId).orderBy('createdAt', descending: true).get();
       List<Question> questions = [];
       querySnapshot.docs.forEach((doc) {
         questions.add(Question(askerId: doc['askerId'],body: doc['body'], createdAt: doc['createdAt'].toString(), header: doc['header'], questionId: doc.id));
       });
       return questions;
-    } on Exception {
-      throw Exception('Failed to get all questions');
+    } catch(e) {
+      throw Exception('Failed to get questions by user ID');
     }
   }
 
