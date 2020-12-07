@@ -26,9 +26,8 @@ class _TabsState extends State<Tabs> {
 
   @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    Database database = Provider.of<Database>(context, listen: false);
+    Database database = Provider.of<Database>(context);
     questions = database.getQuestionsByUserID();
     isCouncilmember = database.currentUser.role == 'councilmember';
     if (isCouncilmember) allQuestions = database.getAllQuestions();
@@ -61,6 +60,7 @@ class _TabsState extends State<Tabs> {
             )
         ),
         body: TabBarView(
+          physics: NeverScrollableScrollPhysics(),
           children: isCouncilmember ? [
             getOwnQuestionsPage(context),
             getQuestionsPage(context),
@@ -121,14 +121,20 @@ class _TabsState extends State<Tabs> {
   }
 
   Widget QuestionListItem(Question question) {
-    return ListTile(
-      title: Text(question.header),
-      subtitle: Text(question.body),
-      onTap: () =>
-          Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => EditQuestion.existingQuestion(question))
-          ),
+    return Dismissible(
+      key: Key(question.header),
+      onDismissed: (direction) {
+        Provider.of<Database>(context, listen:false).deleteQuestion(question.questionId);
+      },
+      child: ListTile(
+        title: Text(question.header),
+        subtitle: Text(question.body),
+        onTap: () =>
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => EditQuestion.existingQuestion(question))
+            ),
+      ),
     );
   }
 }

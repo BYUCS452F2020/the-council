@@ -43,6 +43,13 @@ class Database extends ChangeNotifier {
     }
   }
 
+  Future<void> deleteQuestion(questionId) async {
+    CollectionReference collection = FirebaseFirestore.instance.collection('questions');
+    // CollectionReference usercollection = FirebaseFirestore.instance.collection('questions');
+    await collection.doc(questionId).delete();
+    notifyListeners();
+  }
+
   Future<List<Question>> getAllQuestions() async {
     try {
       CollectionReference collection = FirebaseFirestore.instance.collection('questions');
