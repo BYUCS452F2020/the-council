@@ -10,6 +10,8 @@ import 'package:the_council/request_response/questions_response.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'answer.dart';
+
 class Database extends ChangeNotifier {
   String authToken;
   AuthStatus authstatus = AuthStatus.notSignedIn;
@@ -73,6 +75,38 @@ class Database extends ChangeNotifier {
         questions.add(Question(askerId: doc['askerId'],body: doc['body'], createdAt: doc['createdAt'].toString(), header: doc['header'], questionId: doc.id));
       });
       return questions;
+    } catch(e) {
+      throw Exception('Failed to get questions by user ID');
+    }
+  }
+
+  Future<bool> editAnswer(String questionId, String header, String body) async {
+    CollectionReference question_collection = FirebaseFirestore.instance.collection('questions').doc(questionId).collection('answers');
+    try {
+      await question_collection.add({
+        'answererName': currentUser.name,
+        'answererId': currentUser.userId,
+        'createdAt': Timestamp.now(),
+        'header': header,
+        'body': body
+      });
+
+      notifyListeners();
+    } catch (e) {
+      print('Error creating/editing question: $e');
+    }
+  }
+
+  Future<List<Answer>> getAnswers(String questionId) async {
+    try {
+      CollectionReference collection = FirebaseFirestore.instance.collection('questions').doc(questionId).collection('answers');
+      QuerySnapshot querySnapshot = await collection.get();
+      List<Answer> answers = [];
+      querySnapshot.docs.forEach((doc) {
+        answers.add(Answer(answererName: doc['answererName'],body: doc['body'], createdAt: doc['createdAt'].toString(), header: doc['header'], answererId: doc['answererId']));
+      });
+      print(answers.length);
+      return answers;
     } catch(e) {
       throw Exception('Failed to get questions by user ID');
     }

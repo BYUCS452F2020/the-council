@@ -23,10 +23,10 @@ class _RootState extends State<Root> {
               return Login();
           }
             break;
-          case AuthStatus.signedIn: {
-            return Tabs();
-          }
-            break;
+          // case AuthStatus.signedIn: {
+          //   return Tabs();
+          // }
+          //   break;
           default: {
             return FutureBuilder<UserModel>(
               future: auth.login(), // returns user object from the get-go. they aren't logged in if you've gotten this far.

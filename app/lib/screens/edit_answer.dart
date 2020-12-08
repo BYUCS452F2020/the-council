@@ -2,12 +2,21 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:the_council/models/Question.dart';
 import 'package:the_council/models/database.dart';
 import 'package:the_council/main.dart';
 
 class EditAnswer extends StatelessWidget {
-  final header = TextEditingController();
-  final body = TextEditingController();
+  final Question question;
+  final TextEditingController header;
+  final TextEditingController body;
+
+  EditAnswer(this.question, this.header, this.body);
+
+  factory EditAnswer.newAnswer(Question question) {
+    return EditAnswer(question, TextEditingController(), TextEditingController());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,6 +25,12 @@ class EditAnswer extends StatelessWidget {
         ),
         body: Column(
           children: [
+            Text(
+              this.question.header
+            ),
+            Text(
+                this.question.body
+            ),
             TextField(
               controller: header,
               decoration: InputDecoration(
@@ -31,7 +46,7 @@ class EditAnswer extends StatelessWidget {
             TextButton(
               child: Text('submit'),
               onPressed: () {
-                Provider.of<Database>(context, listen:false).editQuestion(null, header.text, body.text);
+                Provider.of<Database>(context, listen:false).editAnswer(question.questionId, header.text, body.text);
                 Navigator.pop(context);
               },
             )

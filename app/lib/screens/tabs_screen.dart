@@ -5,6 +5,7 @@ import 'package:the_council/models/Question.dart';
 import 'package:the_council/models/database.dart';
 import 'package:the_council/models/usermodel.dart';
 import 'package:the_council/root.dart';
+import 'package:the_council/screens/edit_answer.dart';
 
 import 'edit_question.dart';
 
@@ -132,7 +133,8 @@ class _TabsState extends State<Tabs> {
         onTap: () =>
             Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => EditQuestion.existingQuestion(question))
+                Provider.of<Database>(context, listen:false).currentUser.userId == question.askerId ?
+                  MaterialPageRoute(builder: (context) => EditQuestion.existingQuestion(question)) : MaterialPageRoute(builder: (context) => EditAnswer.newAnswer(question))
             ),
       ),
     );
